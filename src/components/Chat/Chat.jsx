@@ -23,8 +23,6 @@ export const Chat = () => {
         const userInput = inputRef.current.value;
         inputRef.current.value = '';
 
-        console.log(option, language);
-
         getAnswer(userInput, option, language);
     };
 

@@ -8,7 +8,7 @@ import {
 
 export const useChat = () => {
     const [messages, setMessages] = useState(() => {
-        // Hämtar chathistorik från localStorage om det finns, annars välkomstmeddelande
+        // Hämtar sparad chatthistorik från localStorage eller skapar ett välkomstmeddelande
         const chatHistory = JSON.parse(localStorage.getItem('messages')) || [
             {
                 role: 'assistant',
@@ -24,6 +24,7 @@ export const useChat = () => {
             }
         });
     });
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(false);
 
@@ -51,7 +52,7 @@ export const useChat = () => {
         setError(false);
 
         try {
-            // Tilldelar riktlinjer baserat på användarens val
+            // Skapar ett systemmeddelande med instruktioner baserat på användarens val
             const systemMessage =
                 option === 'translate'
                     ? new SystemMessage(
@@ -61,13 +62,16 @@ export const useChat = () => {
                       ? new SystemMessage(
                             'Korrigera grammatiken i användarens text och svara i formatet: "Korrigerad grammatik: <korrigerad text>"',
                         )
-                      : new SystemMessage('Besvara användarens text.');
+                      : new SystemMessage(
+                            'Besvara användarens text kort och koncist.',
+                        );
 
-            // Lägger till AI:n's svar samt riktlinjer (systemMessage) i messages
+            // Skickar instruktionerna och chatthistoriken till AI:n
             const answer = await llm.invoke([systemMessage, ...history]);
 
             const aiMessage = new AIMessage(answer.content);
 
+            // Lägger till AI:ns svar i chatthistoriken
             setMessages([...history, aiMessage]);
         } catch (error) {
             setError(error.message);
